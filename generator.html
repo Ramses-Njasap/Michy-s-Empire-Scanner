@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michy's Empire - Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Classic & Elegant Design */
+        :root {
+            --primary-color: #8a6642;
+            --secondary-color: #d9c3a9;
+            --accent-color: #593a20;
+            --light-color: #f7f2eb;
+            --dark-color: #2c2018;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Baskerville', 'Times New Roman', serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: var(--accent-color);
+            margin-top: 10px;
+        }
+        
+        .generator-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .output-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--secondary-color);
+            border-radius: 3px;
+            font-size: 16px;
+            background-color: var(--light-color);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover {
+            background-color: var(--accent-color);
+        }
+        
+        .code-output {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        #barcodeContainer, #qrcodeContainer {
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .product-info {
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid var(--secondary-color);
+            padding-top: 20px;
+            width: 100%;
+        }
+        
+        .download-options {
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: 5px;
+            border: 1px solid var(--secondary-color);
+        }
+        
+        .download-options h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .size-selector {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .size-selector label {
+            margin-bottom: 0;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .size-selector input {
+            width: 80px;
+            margin-right: 5px;
+        }
+        
+        .size-selector span {
+            margin: 0 5px;
+        }
+        
+        .download-btn {
+            background-color: var(--accent-color);
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .size-presets {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .size-preset {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .size-preset:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .scan-note {
+            font-size: 14px;
+            color: var(--accent-color);
+            font-style: italic;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .qr-options {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 2px solid var(--primary-color);
+            margin-top: 30px;
+            color: var(--accent-color);
+            font-style: italic;
+        }
+
+        @media print {
+            .input-section, button:not(.download-btn), select, footer, header p, .download-options {
+                display: none;
+            }
+            
+            .container {
+                padding: 0;
+            }
+            
+            .output-section {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            header {
+                padding: 10px 0;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MICHY'S EMPIRE</h1>
+            <p class="tagline">Elegant Code Generation for Fashion Excellence</p>
+        </header>
+        
+        <div class="generator-section">
+            <div class="input-section">
+                <h2>Product Details</h2>
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" placeholder="Enter item name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemNumber">Item Number (ID)</label>
+                    <input type="text" id="itemNumber" placeholder="Enter item number/ID">
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemPrice">Item Price</label>
+                    <input type="number" id="itemPrice" placeholder="Enter price" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="codeType">Code Type</label>
+                    <select id="codeType">
+                        <option value="barcode">Barcode</option>
+                        <option value="qrcode">QR Code</option>
+                    </select>
+                </div>
+                
+                <div class="form-group qr-options" id="qrOptions">
+                    <label for="qrErrorCorrectionLevel">Error Correction Level</label>
+                    <select id="qrErrorCorrectionLevel">
+                        <option value="L">Low (7%)</option>
+                        <option value="M" selected>Medium (15%)</option>
+                        <option value="Q">Quartile (25%)</option>
+                        <option value="H">High (30%)</option>
+                    </select>
+                </div>
+                
+                <button id="generateBtn">Generate Code</button>
+                <button id="printBtn">Print</button>
+            </div>
+            
+            <div class="output-section">
+                <div class="code-output">
+                    <div id="barcodeContainer">
+                        <svg id="barcode"></svg>
+                    </div>
+                    
+                    <div id="qrcodeContainer"></div>
+                    
+                    <div class="product-info">
+                        <h3 id="productName"></h3>
+                        <p id="productId"></p>
+                        <p id="productPrice"></p>
+                    </div>
+                    
+                    <div class="download-options" id="downloadOptions">
+                        <h3>Download Options</h3>
+                        <div class="options-grid">
+                            <div class="form-group">
+                                <label for="fileFormat">File Format</label>
+                                <select id="fileFormat">
+                                    <option value="png">PNG</option>
+                                    <option value="jpeg">JPEG</option>
+                                    <option value="svg">SVG (Vector)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="imageQuality">Image Quality</label>
+                                <select id="imageQuality">
+                                    <option value="1">High</option>
+                                    <option value="0.9" selected>Medium</option>
+                                    <option value="0.8">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="imageSize">Image Size</label>
+                            <div class="size-presets">
+                                <span class="size-preset" data-width="400" data-height="250">Small</span>
+                                <span class="size-preset" data-width="800" data-height="500">Medium</span>
+                                <span class="size-preset" data-width="1200" data-height="750">Large</span>
+                                <span class="size-preset" data-width="2000" data-height="1250">X-Large</span>
+                            </div>
+                        </div>
+                        
+                        <div class="size-selector">
+                            <label for="imageWidth">Custom Size:</label>
+                            <input type="number" id="imageWidth" value="800" min="300" max="3000">
+                            <span>×</span>
+                            <input type="number" id="imageHeight" value="500" min="200" max="3000">
+                            <span>px</span>
+                        </div>
+                        
+                        <p class="scan-note">Note: For optimal scanability, PNG format with High quality is recommended.</p>
+                        
+                        <button id="downloadBtn" class="download-btn">Download Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 Michy's Empire. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generateBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const printBtn = document.getElementById('printBtn');
+            const barcodeContainer = document.getElementById('barcodeContainer');
+            const qrcodeContainer = document.getElementById('qrcodeContainer');
+            const downloadOptions = document.getElementById('downloadOptions');
+            const codeTypeSelect = document.getElementById('codeType');
+            const fileFormatSelect = document.getElementById('fileFormat');
+            const qrOptions = document.getElementById('qrOptions');
+            const sizePresets = document.querySelectorAll('.size-preset');
+            
+            let qrcode;
+            let currentCodeType;
+            let currentQRData = '';
+            
+            // Initialize QR code with higher quality settings
+            function initQRCode(errorCorrectionLevel = 'M') {
+                // Clear existing QR code if any
+                qrcodeContainer.innerHTML = '';
+                
+                qrcode = new QRCode(qrcodeContainer, {
+                    width: 300,
+                    height: 300,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel[errorCorrectionLevel]
+                });
+            }
+            
+            initQRCode();
+            
+            // Show/hide QR options based on code type
+            codeTypeSelect.addEventListener('change', function() {
+                const codeType = this.value;
+                currentCodeType = codeType;
+                
+                if (codeType === 'qrcode') {
+                    qrOptions.style.display = 'block';
+                } else {
+                    qrOptions.style.display = 'none';
+                }
+                
+                // Update available file formats
+                updateFileFormats(codeType);
+            });
+            
+            // Update file formats based on code type
+            function updateFileFormats(codeType) {
+                fileFormatSelect.innerHTML = '';
+                
+                if (codeType === 'barcode') {
+                    appendOption(fileFormatSelect, 'PNG', 'png');
+                    appendOption(fileFormatSelect, 'SVG (Vector)', 'svg');
+                    appendOption(fileFormatSelect, 'JPEG', 'jpeg');
+                } else {
+                    appendOption(fileFormatSelect, 'PNG', 'png');
+                    appendOption(fileFormatSelect, 'SVG (Vector)', 'svg');
+                    appendOption(fileFormatSelect, 'JPEG', 'jpeg');
+                }
+            }
+            
+            // Initialize file formats
+            updateFileFormats('barcode');
+            
+            function appendOption(selectElement, text, value) {
+                const option = document.createElement('option');
+                option.text = text;
+                option.value = value;
+                selectElement.add(option);
+            }
+            
+            // Size preset click handlers
+            sizePresets.forEach(preset => {
+                preset.addEventListener('click', function() {
+                    const width = this.getAttribute('data-width');
+                    const height = this.getAttribute('data-height');
+                    document.getElementById('imageWidth').value = width;
+                    document.getElementById('imageHeight').value = height;
+                });
+            });
+            
+            generateBtn.addEventListener('click', function() {
+                const itemName = document.getElementById('itemName').value.trim();
+                const itemNumber = document.getElementById('itemNumber').value.trim();
+                const itemPrice = document.getElementById('itemPrice').value;
+                const codeType = document.getElementById('codeType').value;
+                currentCodeType = codeType;
+                
+                // Basic validation
+                if (!itemName || !itemNumber || !itemPrice) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                // Format price with currency
+                const formattedPrice = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(itemPrice);
+                
+                // Update product info
+                document.getElementById('productName').textContent = itemName;
+                document.getElementById('productId').textContent = `ID: ${itemNumber}`;
+                document.getElementById('productPrice').textContent = formattedPrice;
+                
+                // Generate the selected code type
+                if (codeType === 'barcode') {
+                    barcodeContainer.style.display = 'block';
+                    qrcodeContainer.style.display = 'none';
+                    
+                    // Generate barcode using JsBarcode with optimized settings for scanning
+                    JsBarcode("#barcode", itemNumber, {
+                        format: "CODE128",
+                        lineColor: "#000000", // Pure black for better contrast
+                        width: 3,             // Wider bars for better scanning
+                        height: 120,          // Taller bars for better scanning
+                        displayValue: true,
+                        fontSize: 18,
+                        margin: 20,           // Larger margin for scanning
+                        background: "#ffffff" // Pure white background
+                    });
+                } else {
+                    barcodeContainer.style.display = 'none';
+                    qrcodeContainer.style.display = 'block';
+                    
+                    // Get error correction level
+                    const errorCorrectionLevel = document.getElementById('qrErrorCorrectionLevel').value;
+                    
+                    // Reinitialize QR code with selected error correction level
+                    initQRCode(errorCorrectionLevel);
+                    
+                    // Generate QR code with combined information
+                    currentQRData = `Name: ${itemName}\nID: ${itemNumber}\nPrice: ${formattedPrice}`;
+                    qrcode.makeCode(currentQRData);
+                }
+                
+                // Show download options
+                downloadOptions.style.display = 'block';
+            });
+            
+            downloadBtn.addEventListener('click', function() {
+                const codeType = currentCodeType;
+                const fileFormat = document.getElementById('fileFormat').value;
+                const imageQuality = parseFloat(document.getElementById('imageQuality').value);
+                const imageWidth = parseInt(document.getElementById('imageWidth').value);
+                const imageHeight = parseInt(document.getElementById('imageHeight').value);
+                const itemNumber = document.getElementById('itemNumber').value.trim();
+                
+                // Validate size
+                if (imageWidth < 300 || imageHeight < 200 || imageWidth > 3000 || imageHeight > 3000) {
+                    alert('Image dimensions must be between 300×200px and 3000×3000px for optimal scanning');
+                    return;
+                }
+                
+                if (codeType === 'barcode') {
+                    downloadBarcode(fileFormat, imageWidth, imageHeight, imageQuality, itemNumber);
+                } else {
+                    downloadQRCode(fileFormat, imageWidth, imageHeight, imageQuality, itemNumber);
+                }
+            });
+            
+            function downloadBarcode(format, width, height, quality, itemNumber) {
+                // Get the SVG element
+                const svgElement = document.getElementById('barcode');
+                
+                if (format === 'svg') {
+                    // For optimal scanning of SVG barcodes, we need to ensure proper scaling
+                    const originalSvg = new XMLSerializer().serializeToString(svgElement);
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(originalSvg, 'image/svg+xml');
+                    const svgRoot = svgDoc.documentElement;
+                    
+                    // Get original viewBox values
+                    const originalViewBox = svgRoot.getAttribute('viewBox');
+                    const viewBoxValues = originalViewBox ? originalViewBox.split(' ').map(Number) : [0, 0, svgElement.width.baseVal.value, svgElement.height.baseVal.value];
+                    
+                    // Set width and height attributes
+                    svgRoot.setAttribute('width', width);
+                    svgRoot.setAttribute('height', height);
+                    
+                    // Preserve aspect ratio for optimal scanning
+                    svgRoot.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    
+                    const enhancedSvg = new XMLSerializer().serializeToString(svgDoc);
+                    const blob = new Blob([enhancedSvg], {type: 'image/svg+xml'});
+                    downloadFile(blob, `michy-barcode-${itemNumber}.svg`);
+                } else {
+                    // For raster formats, we need to ensure high resolution and contrast
+                    renderHiResBarcode(svgElement, width, height, format, quality, itemNumber);
+                }
+            }
+            
+            function renderHiResBarcode(svgElement, width, height, format, quality, itemNumber) {
+                const canvas = document.createElement('canvas');
+                // Use higher resolution for better scanning
+                const scale = 2; // 2x resolution for better scanning
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                const ctx = canvas.getContext('2d');
+                
+                // Fill with pure white
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                // Create Blob URL for better image handling
+                const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+                const url = URL.createObjectURL(svgBlob);
+                
+                const img = new Image();
+                img.src = url;
+                
+                img.onload = function() {
+                    // Draw at full resolution
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Increase contrast for better scanning
+                    enhanceContrast(ctx, canvas.width, canvas.height);
+                    
+                    URL.revokeObjectURL(url);
+                    
+                    // Convert canvas to blob and download
+                    canvas.toBlob(function(blob) {
+                        downloadFile(blob, `michy-barcode-${itemNumber}.${format}`);
+                    }, `image/${format}`, quality);
+                };
+            }
+            
+            function downloadQRCode(format, width, height, quality, itemNumber) {
+                if (format === 'svg') {
+                    // Create high-quality SVG QR code
+                    const errorCorrectionLevel = document.getElementById('qrErrorCorrectionLevel').value;
+                    const svgContent = generateSVGQRCode(currentQRData, width, height, errorCorrectionLevel);
+                    const blob = new Blob([svgContent], {type: 'image/svg+xml'});
+                    downloadFile(blob, `michy-qrcode-${itemNumber}.svg`);
+                } else {
+                    // For raster formats, use the canvas with improved resolution
+                    const canvas = qrcodeContainer.querySelector('canvas');
+                    
+                    // Create high-res canvas
+                    const hiResCanvas = document.createElement('canvas');
+                    const scale = 3; // 3x resolution for QR codes for better scanning
+                    hiResCanvas.width = width * scale;
+                    hiResCanvas.height = height * scale;
+                    const ctx = hiResCanvas.getContext('2d');
+                    
+                    // Fill with white background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, hiResCanvas.width, hiResCanvas.height);
+                    
+                    // Draw the QR code at high resolution
+                    ctx.drawImage(canvas, 0, 0, hiResCanvas.width, hiResCanvas.height);
+                    
+                    // Enhance contrast for better scanning
+                    enhanceContrast(ctx, hiResCanvas.width, hiResCanvas.height);
+                    
+                    // Add quiet zone (white space) around QR code for better scanning
+                    addQuietZone(ctx, hiResCanvas.width, hiResCanvas.height);
+                    
+                    // Convert to blob and download
+                    hiResCanvas.toBlob(function(blob) {
+                        downloadFile(blob, `michy-qrcode-${itemNumber}.${format}`);
+                    }, `image/${format}`, quality);
+                }
+            }
+            
+            function generateSVGQRCode(data, width, height, errorLevel) {
+                // This is a simplified approach - for production, you'd want a more robust QR code SVG generator
+                // We're creating a temporary QR code and tracing it to SVG
+                
+                // Create a temporary container
+                const tempContainer = document.createElement('div');
+                document.body.appendChild(tempContainer);
+                
+                // Create QR code with high error correction
+                const tempQR = new QRCode(tempContainer, {
+                    text: data,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel[errorLevel]
+                });
+                
+                // Get the canvas
+                const canvas = tempContainer.querySelector('canvas');
+                const ctx = canvas.getContext('2d');
+                const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                
+                // Calculate QR code grid size
+                const moduleCount = Math.sqrt(data.length) * 2; // Rough estimate
+                const quietZone = 4; // Standard quiet zone is 4 modules
+                const totalSize = moduleCount + (quietZone * 2);
+                
+                // Create SVG content with proper quiet zone
+                let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalSize} ${totalSize}" width="${width}" height="${height}">\n`;
+                svgContent += `<rect width="${totalSize}" height="${totalSize}" fill="white"/>\n`;
+                
+                // Calculate dot size
+                const dotSize = canvas.width / moduleCount;
+                
+                // Add QR dots to SVG
+                for (let y = 0; y < canvas.height; y += dotSize) {
+                    for (let x = 0; x < canvas.width; x += dotSize) {
+                        const i = ((Math.floor(y) * canvas.width) + Math.floor(x)) * 4;
+                        // Check if this pixel is dark (QR code dot)
+                        if (pixelData[i] < 128) { // Dark pixel
+                            const adjustedX = x / dotSize + quietZone;
+                            const adjustedY = y / dotSize + quietZone;
+                            svgContent += `<rect x="${adjustedX}" y="${adjustedY}" width="1" height="1" fill="black"/>\n`;
+                        }
+                    }
+                }
+                
+                svgContent += '</svg>';
+                
+                // Clean up
+                document.body.removeChild(tempContainer);
+                
+                return svgContent;
+            }
+            
+            function enhanceContrast(ctx, width, height) {
+                // Get image data
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                // Increase contrast - make dark pixels black and light pixels white
+                const threshold = 200; // Threshold for black/white decision
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    // Binary threshold
+                    const newValue = avg < threshold ? 0 : 255;
+                    
+                    data[i] = newValue;     // R
+                    data[i + 1] = newValue; // G
+                    data[i + 2] = newValue; // B
+                    // Keep alpha the same
+                }
+                
+                // Put the modified data back
+                ctx.putImageData(imageData, 0, 0);
+            }
+            
+            function addQuietZone(ctx, width, height) {
+                // Add white padding around the QR code (quiet zone)
+                // This function assumes the QR code already has some padding
+                // Just ensuring the edges are clean white
+                const borderSize = Math.min(width, height) * 0.05; // 5% border
+                
+                ctx.fillStyle = '#ffffff';
+                // Top border
+                ctx.fillRect(0, 0, width, borderSize);
+                // Bottom border
+                ctx.fillRect(0, height - borderSize, width, borderSize);
+                // Left border
+                ctx.fillRect(0, 0, borderSize, height);
+                // Right border
+                ctx.fillRect(width - borderSize, 0, borderSize, height);
+            }
+            
+            function downloadFile(blob, fileName) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Clean up
+                setTimeout(() => {
+                    URL.revokeObjectURL(link.href);
+                }, 100);
+            }
+            
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+        });
+    </script>
+</body>
+</html>
